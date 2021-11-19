@@ -22,14 +22,15 @@ public class mainClass {
             data = scanner.nextLine();
             String[]dataSplit = data.split(" ");
             dataSplit[0] =dataSplit[0].replace("!", " ");
-
+            dataSplit[1] = dataSplit[1].replace("!"," ");
             lessonData[i++] = new lesson(dataSplit[0],dataSplit[1], dataSplit[2], dataSplit[3],Integer.parseInt(dataSplit[4]),Integer.parseInt(dataSplit[5]));
         }
         Scanner input = new Scanner(System.in);
         userWant[0] = input.nextInt();
         userWant[1] = input.nextInt();
         userWant[2] = input.nextInt();
-        System.out.println(lessonData[i-1].getLessonName()+lessonData[i-1].getLesson_num()+userWant[0]+userWant[1]+userWant[2]);
+
+
         //    input ( File I/O , 학수 번호 3개 입력) 완료
 //
 //    시간표 객체화 3개
