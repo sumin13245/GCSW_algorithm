@@ -1,33 +1,35 @@
 package com.example.gachonalg;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Scanner;
 
 public class mainClass {
 
-    public static void main(String[] args) throws IOException {
-        Scanner scanner = new Scanner(new File("input.txt"));
-        String lessonName, professorName, date, building;
-        int building_num, lesson_num;
+    public static void main(String[] args) throws IOException{
+        FileInputStream file_input = new FileInputStream("C:/Users/ADMIN/Desktop/2021_2Study/algorithm/algo_java/src/input.txt");
+
+
+        Scanner scanner = new Scanner(file_input);
+        String data ;//lessonName, professorName, date, building,building_num, lesson_num;
         int[] userWant = new int[3];
+
         lesson[] lessonData = new lesson[200]; // 데이터 배열로 담았어요 (매번 io 하긴 느릴 것 같아서)
         int i = 0;
 
         while (scanner.hasNext()) {
-            lessonName = scanner.next().replace("!", " ");
-            professorName = scanner.next();
-            date = scanner.next();
-            building = scanner.next();
-            building_num = scanner.nextInt();
-            lesson_num = scanner.nextInt();
-            lessonData[i++].setInfo(lessonName, professorName, date, building, building_num, lesson_num);
+            data = scanner.nextLine();
+            String[]dataSplit = data.split(" ");
+            dataSplit[0] =dataSplit[0].replace("!", " ");
+
+            lessonData[i++] = new lesson(dataSplit[0],dataSplit[1], dataSplit[2], dataSplit[3],Integer.parseInt(dataSplit[4]),Integer.parseInt(dataSplit[5]));
         }
         Scanner input = new Scanner(System.in);
         userWant[0] = input.nextInt();
         userWant[1] = input.nextInt();
         userWant[2] = input.nextInt();
-
+        System.out.println(lessonData[i-1].getLessonName()+lessonData[i-1].getLesson_num()+userWant[0]+userWant[1]+userWant[2]);
         //    input ( File I/O , 학수 번호 3개 입력) 완료
 //
 //    시간표 객체화 3개

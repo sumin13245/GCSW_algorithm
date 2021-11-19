@@ -8,7 +8,7 @@ class lesson {
     int building_num;
     int lesson_num;
 
-    public void setInfo(String lessonName, String professorName, String date, String building, int building_num,int lesson_num) {
+    public  lesson(String lessonName, String professorName, String date, String building, int building_num, int lesson_num) {
         this.lessonName = lessonName;
         this.professorName = professorName;
         this.date = date;
