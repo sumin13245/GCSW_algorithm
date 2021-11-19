@@ -1,4 +1,4 @@
-package timeTable;
+package com.example.gachonalg;
 
 public class timeTable {
 	private lesson[] table;//monday 0-4,tuesday 5-9, ... friday 20-24
