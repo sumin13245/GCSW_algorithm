@@ -1,4 +1,4 @@
-package timeTable;
+package com.example.gachonalg;
 
 class lesson {
     String lessonName;
