@@ -1,12 +1,12 @@
 package com.example.gachonalg;
 
 class lesson {
-    String lessonName;
-    String professorName;
-    String date;
-    String building;
-    int building_num;
-    int lesson_num;
+    private String lessonName;
+    private String professorName;
+    private String date;
+    private String building;
+    private int building_num;
+    private int lesson_num;
     
     
     lesson(String lessonName, String professorName, String date, String building, int building_num, int lesson_num) {
