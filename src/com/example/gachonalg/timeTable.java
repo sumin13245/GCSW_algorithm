@@ -2,24 +2,33 @@ package com.example.gachonalg;
 
 public class timeTable {
 	private lesson[] table;//monday 0-4,tuesday 5-9, ... friday 20-24
-	
+	private boolean[] days = {false,false,false,false,false};
+	private int numOfLessons = 0;
+
 	private int[] index = new int[25];//monday 0-4,tuesday 5-9, ... friday 20-24 has lesson_num is no lesson, has 0
 	
 	timeTable(){
 		table = new lesson[25];
 	}
 	
-	public void addLesson(lesson lesson) {//If can put the lesson in the timetable, put it in the table and index.
+	public boolean addLesson(lesson lesson) {//If can put the lesson in the timetable, put it in the table and index.
 		if(isCanPutIn(lesson)) {
 			int length = lesson.getDate().length();
 			for(int i =0; i<length; i+=2) {
-				int lessonIndex = dateToIndex(lesson.getDate().substring(i,i+2));
+				int lessonIndex = lesson.dateToIndex();
 				table[lessonIndex]=lesson;
 				index[lessonIndex]=lesson.getLesson_num();
+
+				countVars(lessonIndex);
 			}
-		}else  System.out.println("Can't do that");
+			return true;
+		}
+		else {
+			System.out.println("Can't do that");
+			return false;
+		}
 	}
-	
+
 	public boolean isDuplicate(lesson lesson) {//Check if there's the same lesson
 		for(int i = 0; i<25; i++) {
 			if(index[i]!=0) {
@@ -33,22 +42,11 @@ public class timeTable {
 	public boolean isCanPutIn(lesson lesson) {//Check if there are duplicate lesson and if there are other lesson in the that lecture's time to see if you can put them in or not.
 		int length = lesson.getDate().length();
 		for(int i =0; i<length; i+=2) {
-			int lessonIndex = dateToIndex(lesson.getDate().substring(i,i+2));
+			int lessonIndex = lesson.dateToIndex();
 			if(table[lessonIndex]!=null)return false;
 		}
 		if(this.isDuplicate(lesson))return false;
 		return true;
-	}
-	
-	public int dateToIndex(String date) {//receive the value like 월1,화2... ,return the correct index
-		int lessonIndex;
-		char[] temp = date.toCharArray();
-		if(temp[0]=='월')lessonIndex = -1+(temp[1]-'0');
-		else if(temp[0]=='화')lessonIndex = 4+(temp[1]-'0');
-		else if(temp[0]=='수')lessonIndex = 9+(temp[1]-'0');
-		else if(temp[0]=='목')lessonIndex = 14+(temp[1]-'0');
-		else lessonIndex = 19+(temp[1]-'0');
-		return lessonIndex;
 	}
 	
 	public void print() {
@@ -62,5 +60,38 @@ public class timeTable {
 			System.out.printf("%-15s|  %s\n\n","17:30 ~ 19:30",(table[i+4]!=null)?(table[i+4].toString()):"");
 		}
 	}
-	
+
+	//method countVars for counting num of lessons and Check the days of the week.
+	private  void countVars(int lessonIndex) {
+
+		numOfLessons++;
+		if( lessonIndex >= 0 && lessonIndex < 5)
+		{
+			days[0] = true;
+		}
+		else if( lessonIndex >= 5 && lessonIndex < 10)
+		{
+			days[1] = true;
+		}
+		else if( lessonIndex >= 10 && lessonIndex < 15)
+		{
+			days[2] = true;
+		}
+		else if( lessonIndex >= 15 && lessonIndex < 20)
+		{
+			days[3] = true;
+		}
+		else if( lessonIndex >= 20 && lessonIndex < 25)
+		{
+			days[4] = true;
+		}
+	}
+
+	public int getNumOfLesson() {
+		return numOfLessons;
+	}
+	public boolean[] getDays() {
+		return days;
+	}
+
 }
