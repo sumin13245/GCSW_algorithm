@@ -1,6 +1,7 @@
 package com.example.gachonalg;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class mainClass {
@@ -37,25 +38,59 @@ public class mainClass {
                     j++;
                     //여기에 그 파일에서 학수번호로 lesson 찾아서 inputTimes 나오니까 true 나올 때까지 받게 하면 중복피할 수 있음(완료)
         }
-
+        inputTimeTable = closeDistance(inputTimeTable,i,lessonData);
+        inputTimeTable.print();
         input.close();
+
     } // main 함수의 끝 부분 괄호
 
-    private  timeTable closeDistance(timeTable inputTT,int max,lesson[] lessonsData){
-
-        // 먼저 건물이 4 개니 각각의 건물을 기준으로 정렬한 레슨데이터 4개를 생성,
-        //가장 가까운 건물의 경우 층수도 가장 가까운 것을 기준으로 정렬하고 다른 건물은 1층부터 정렬한다
-
-
-            // 정렬된  lesson data 중에서 시간이 가까운걸 위주로 add lesson 한다 (공강 만들고 다시 데이터를 넣다가 섞여서 제 기능 못하는 상황 방지)
-            //먼저 userwant 전후의 수업을 이어붙인다
-            // 이어붙이면 it 대학 수업의 경우 수업을 이틀 해서 다른 날도 길이 생김 그럼 거기에도 이어붙임
-
-            // 수업이 없는 날이 나온다면 다음 데이터를  이미 있는 수업과 다른 수업데이터를 하나씩 집어넣는다 (분배를 위해 다른 수업)
-            // 이제 기존 데이터를 기준으로 가까운 데이터를 집어넣어야 하는데  만약에 user want 가 같은날 여러개면
-            // 시간대가 이후인 userwant 이전인 시간 까지만 데이터를 집어넣고 이후에 또 이어붙여야 한다
+    private static timeTable closeDistance(timeTable inputTT,int max,lesson[] lessonsData){
+                // 그냥 바로 다음 수업만 추가하겠습니다
+        distance Distance = new distance();// 검색을 위한 context,queryMinDistance 에서 만들면 낭비일거같아 여기서 만듭니다
+        lesson[] tableData = inputTT.getTable();
+        char[] date;
+        int index;
+        // 추가예정 사항 및 문제점들
+        //while 여러번 시키는 코드 추가예정
+        // 지금은 it대학의 경우 가장 짧은 길이 수업2개인 it 대학밖에 없으니 추가 실패할 가능성이 커진다 그래서 차선책들도 insert 해야 함
+        //수업 두개있는 강의인 경우 뒷 수업은 고려하지 않는다
 
 
+        for(int i = 0;i<25;i++) {  // 안에 들어있는 데이터를 검사
+
+            if(tableData[i]!=null){//찾으면
+                char[]reqDate = new char[2];
+                index = tableData[i].dateToIndex();
+                date= tableData[i].getDate().toCharArray();
+                reqDate[0] = date[0];
+
+                switch (index%5){
+                    case 0: // 다음 수업 하나를 찿고 그중에서 min 값을 찾으면 데이터를 삽입한다.
+                        reqDate[1] = (char)((int)date[1]+1);
+                        index = queryMinDistance(Distance,tableData[i],lessonsData,reqDate,max);
+                        if(index != -1) inputTT.addLesson(lessonsData[index]);
+                        break;
+
+                    case 4://앞으로만 이어붙이기
+                        reqDate[1] = (char)((int)date[1]-1);
+                        index = queryMinDistance(Distance,tableData[i],lessonsData,reqDate,max);
+                        if(index != -1) inputTT.addLesson(lessonsData[index]);
+                        break;
+
+
+                    default:// 앞 뒤로 이어붙이기 for 1 2 3
+                        reqDate[1] = (char)((int)date[1]-1);
+                        index = queryMinDistance(Distance,tableData[i],lessonsData,reqDate,max);
+                        if(index != -1) inputTT.addLesson(lessonsData[index]);
+
+                        reqDate[1] = (char)((int)date[1]+1);
+                        index = queryMinDistance(Distance,tableData[i],lessonsData,reqDate,max);
+                        if(index != -1) inputTT.addLesson(lessonsData[index]);
+                        break;
+                }
+
+            }
+        }
 
         return inputTT;
     }
@@ -108,6 +143,34 @@ public class mainClass {
             }
         }
     }
+
+
+    private static int queryMinDistance(distance Distance,lesson userLs,lesson[] lessonData,char[] reqDate ,int dataSize){
+        int minIndex = -1;
+        double minDis = 10000;
+        double disInfo;
+        String sReqDate = new String(reqDate);
+
+        for(int k = 0;k<dataSize;k++) {
+            // getDistance(String src, String des,double srcFloor, double desFloor)
+            if (lessonData[k].getDate().contains(sReqDate)) {
+                if(lessonData[k].dateToIndex()!=userLs.getLesson_num()) {
+                    disInfo = Distance.getDistance(userLs.getBuilding(), lessonData[k].getBuilding(), userLs.getBuilding_num(), lessonData[k].getBuilding_num());
+                    if (minDis > disInfo) {
+                        minIndex = k;
+                        minDis = disInfo;
+                    }
+                }
+            }
+
+        }
+        if(minDis == 10000)
+            System.out.println("Cannot find lesson");
+
+
+        return  minIndex;
+    }
+
     private static int queryAsNum(int userWant,lesson[] lessonData,int dataSize){
         for(int k = 0;k<dataSize;k++) {
             if (lessonData[k].getLesson_num() == userWant)

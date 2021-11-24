@@ -87,6 +87,7 @@ public class timeTable {
 		}
 	}
 
+	public lesson[] getTable(){return table;}
 	public int getNumOfLesson() {
 		return numOfLessons;
 	}
