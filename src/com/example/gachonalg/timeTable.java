@@ -13,9 +13,12 @@ public class timeTable {
 	
 	public boolean addLesson(lesson lesson) {//If can put the lesson in the timetable, put it in the table and index.
 		if(isCanPutIn(lesson)) {
-			int length = lesson.getDate().length();
+			char date[] = lesson.getDate().toCharArray();
+			int length = date.length;
+
 			for(int i =0; i<length; i+=2) {
-				int lessonIndex = lesson.dateToIndex();
+				date[0]= date[i];// 이후 수업 고려를 위해
+				int lessonIndex = lesson.dateToIndex(date);
 				table[lessonIndex]=lesson;
 				index[lessonIndex]=lesson.getLesson_num();
 
@@ -40,9 +43,11 @@ public class timeTable {
 	}
 	
 	public boolean isCanPutIn(lesson lesson) {//Check if there are duplicate lesson and if there are other lesson in the that lecture's time to see if you can put them in or not.
-		int length = lesson.getDate().length();
+		char date[] = lesson.getDate().toCharArray();
+		int length = date.length;
 		for(int i =0; i<length; i+=2) {
-			int lessonIndex = lesson.dateToIndex();
+			date[0]= date[i];// 두개인 수업일 때 이후 수업 고려를 위해
+			int lessonIndex = lesson.dateToIndex(date);
 			if(table[lessonIndex]!=null)return false;
 		}
 		if(this.isDuplicate(lesson))return false;

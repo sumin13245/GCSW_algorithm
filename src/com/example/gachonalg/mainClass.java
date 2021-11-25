@@ -50,50 +50,44 @@ public class mainClass {
         lesson[] tableData = inputTT.getTable();
         char[] date;
         int index;
-        // 추가예정 사항 및 문제점들
-        //while 여러번 시키는 코드 추가예정
-        // 지금은 it대학의 경우 가장 짧은 길이 수업2개인 it 대학밖에 없으니 추가 실패할 가능성이 커진다 그래서 차선책들도 insert 해야 함
-        //수업 두개있는 강의인 경우 뒷 수업은 고려하지 않는다
+        for(int chack = 0; chack<5;chack++)
+            for(int i = 0;i<25;i++) {  // 안에 들어있는 데이터를 검사
 
-
-        for(int i = 0;i<25;i++) {  // 안에 들어있는 데이터를 검사
-
-            if(tableData[i]!=null){//찾으면
-                char[]reqDate = new char[2];
-                index = tableData[i].dateToIndex();
-                date= tableData[i].getDate().toCharArray();
-                reqDate[0] = date[0];
-
-                switch (index%5){
-                    case 0: // 다음 수업 하나를 찿고 그중에서 min 값을 찾으면 데이터를 삽입한다.
-                        reqDate[1] = (char)((int)date[1]+1);
-                        index = queryMinDistance(Distance,tableData[i],lessonsData,reqDate,max);
-                        if(index != -1) inputTT.addLesson(lessonsData[index]);
-                        break;
-
-                    case 4://앞으로만 이어붙이기
-                        reqDate[1] = (char)((int)date[1]-1);
-                        index = queryMinDistance(Distance,tableData[i],lessonsData,reqDate,max);
-                        if(index != -1) inputTT.addLesson(lessonsData[index]);
-                        break;
-
-
-                    default:// 앞 뒤로 이어붙이기 for 1 2 3
-                        reqDate[1] = (char)((int)date[1]-1);
-                        index = queryMinDistance(Distance,tableData[i],lessonsData,reqDate,max);
-                        if(index != -1) inputTT.addLesson(lessonsData[index]);
-
-                        reqDate[1] = (char)((int)date[1]+1);
-                        index = queryMinDistance(Distance,tableData[i],lessonsData,reqDate,max);
-                        if(index != -1) inputTT.addLesson(lessonsData[index]);
-                        break;
-                }
-
-            }
+             if(tableData[i]!=null) {//찾으면
+                 char[] reqDate = new char[2];
+                 date = tableData[i].getDate().toCharArray();
+                 for (int cp = 0; cp < date.length; cp += 2) {
+                     date[0]= date[cp];
+                     reqDate[0] = date[0];
+                     index = tableData[i].dateToIndex(date);
+                     switch (index % 5) {
+                         case 0: // 다음 수업 하나를 찿고 그중에서 min 값을 찾으면 데이터를 삽입한다.
+                             putMdLesson(Distance, inputTT, tableData, lessonsData, date, index, i, reqDate, max, 1);
+                             break;
+                         case 4://앞으로만 이어붙이기
+                             putMdLesson(Distance, inputTT, tableData, lessonsData, date, index, i, reqDate, max, -1);
+                             break;
+                         default:// 앞 뒤로 이어붙이기 for 1 2 3
+                             putMdLesson(Distance, inputTT, tableData, lessonsData, date, index, i, reqDate, max, -1);
+                             putMdLesson(Distance, inputTT, tableData, lessonsData, date, index, i, reqDate, max, 1);
+                             break;
+                     }
+                 }
+             }
         }
 
         return inputTT;
     }
+
+    private static void putMdLesson(distance distance,timeTable inputTT, lesson[] tableData, lesson[] lessonsData,char[] date, int index, int i, char[] reqDate, int max,int mode) {
+        int tableIndex;
+        if(tableData[index+mode]==null) {
+            reqDate[1] = (char) ((int) date[1] +mode);
+            tableIndex = queryMinDistance(distance, inputTT, tableData[i], lessonsData, reqDate, max);
+            if (tableIndex != -1) inputTT.addLesson(lessonsData[tableIndex]);
+        }
+    }
+
     //method daysOff with input timetable and max number of lessons and lessonData array
     private timeTable daysOff(timeTable inputTT, int max, lesson[] lessonsData) {
         // add maximum lesson when same days.
@@ -118,23 +112,23 @@ public class mainClass {
         while (j <= 200 && inputTT.getNumOfLesson() < max - 1) {
             switch (day) {
                 case 0:
-                    if (lessonsData[j].dateToIndex() <= 0 && lessonsData[j].dateToIndex() < 5) {
+                    if (lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) <= 0 && lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) < 5) {
                         inputTT.addLesson(lessonsData[j]);
                     } else j++;
                 case 1:
-                    if (lessonsData[j].dateToIndex() <= 5 && lessonsData[j].dateToIndex() < 10) {
+                    if (lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) <= 5 && lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) < 10) {
                         inputTT.addLesson(lessonsData[j]);
                     } else j++;
                 case 2:
-                    if (lessonsData[j].dateToIndex() <= 10 && lessonsData[j].dateToIndex() < 15) {
+                    if (lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) <= 10 && lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) < 15) {
                         inputTT.addLesson(lessonsData[j]);
                     } else j++;
                 case 3:
-                    if (lessonsData[j].dateToIndex() <= 15 && lessonsData[j].dateToIndex() < 20) {
+                    if (lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) <= 15 && lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) < 20) {
                         inputTT.addLesson(lessonsData[j]);
                     } else j++;
                 case 4:
-                    if (lessonsData[j].dateToIndex() <= 20 && lessonsData[j].dateToIndex() < 25) {
+                    if (lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) <= 20 && lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) < 25) {
                         inputTT.addLesson(lessonsData[j]);
                     } else j++;
                 default:
@@ -145,28 +139,23 @@ public class mainClass {
     }
 
 
-    private static int queryMinDistance(distance Distance,lesson userLs,lesson[] lessonData,char[] reqDate ,int dataSize){
+    private static int queryMinDistance(distance Distance,timeTable inputTT,lesson userLs,lesson[] lessonData,char[] reqDate ,int dataSize){
         int minIndex = -1;
         double minDis = 10000;
         double disInfo;
         String sReqDate = new String(reqDate);
 
         for(int k = 0;k<dataSize;k++) {
-            // getDistance(String src, String des,double srcFloor, double desFloor)
             if (lessonData[k].getDate().contains(sReqDate)) {
-                if(lessonData[k].dateToIndex()!=userLs.getLesson_num()) {
-                    disInfo = Distance.getDistance(userLs.getBuilding(), lessonData[k].getBuilding(), userLs.getBuilding_num(), lessonData[k].getBuilding_num());
-                    if (minDis > disInfo) {
+                disInfo = Distance.getDistance(userLs.getBuilding(), lessonData[k].getBuilding(), userLs.getBuilding_num(), lessonData[k].getBuilding_num());
+                    if (minDis > disInfo && inputTT.isCanPutIn(lessonData[k])) {
                         minIndex = k;
                         minDis = disInfo;
                     }
-                }
             }
-
         }
         if(minDis == 10000)
-            System.out.println("Cannot find lesson");
-
+            System.out.println("Cannot find lesson for: "+sReqDate);
 
         return  minIndex;
     }
@@ -179,6 +168,7 @@ public class mainClass {
         System.out.println("Cannot find lesson");
         return  -1;
     }
+
 }
 /*데이터 set
 인터페이스

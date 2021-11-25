@@ -18,14 +18,15 @@ class lesson {
         this.lesson_num = lesson_num;
     }
 
-    public int dateToIndex() {//receive the value like 월1,화2... ,return the correct index
+    public int dateToIndex(char[] temp) {//receive the value like 월1,화2... ,return the correct index
         int lessonIndex;
-        char[] temp = date.toCharArray();
-        if(temp[0]=='월')lessonIndex = -1+(temp[1]-'0');
-        else if(temp[0]=='화')lessonIndex = 4+(temp[1]-'0');
-        else if(temp[0]=='수')lessonIndex = 9+(temp[1]-'0');
-        else if(temp[0]=='목')lessonIndex = 14+(temp[1]-'0');
-        else lessonIndex = 19+(temp[1]-'0');
+        //char[] temp = date.toCharArray();
+        if (temp[0] == '월') lessonIndex = -1 + (temp[1] - '0');
+            else if (temp[0] == '화') lessonIndex = 4 + (temp[1] - '0');
+            else if (temp[0] == '수') lessonIndex = 9 + (temp[1] - '0');
+            else if (temp[0] == '목') lessonIndex = 14 + (temp[1] - '0');
+            else lessonIndex = 19 + (temp[1] - '0');
+
         return lessonIndex;
     }
 
