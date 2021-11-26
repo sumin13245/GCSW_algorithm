@@ -89,7 +89,7 @@ public class mainClass {
     }
 
     //method daysOff with input timetable and max number of lessons and lessonData array
-    private timeTable daysOff(timeTable inputTT, int max, lesson[] lessonsData) {
+    private static timeTable daysOff(timeTable inputTT, int max, lesson[] lessonsData) {
         // add maximum lesson when same days.
         for (int i = 0; i < 5; i++) {
             if (inputTT.getDays()[i]) {
@@ -107,30 +107,30 @@ public class mainClass {
         return inputTT; //return result table
     }
 
-    private void addLessonSameDay(int day, int max, timeTable inputTT, lesson[] lessonsData) {
+private static void addLessonSameDay(int day, int max, timeTable inputTT, lesson[] lessonsData) {
         int j = 0;
-        while (j <= 200 && inputTT.getNumOfLesson() < max - 1) {
+        while (j <= 157 && inputTT.getNumOfLesson() < max - 1) {
             switch (day) {
                 case 0:
-                    if (lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) <= 0 && lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) < 5) {
-                        inputTT.addLesson(lessonsData[j]);
-                    } else j++;
+                    if (lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) <= 0 && lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) < 5)inputTT.addLesson(lessonsData[j]);
+                    j++;
+                    break;
                 case 1:
-                    if (lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) <= 5 && lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) < 10) {
-                        inputTT.addLesson(lessonsData[j]);
-                    } else j++;
+                    if (lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) <= 5 && lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) < 10)inputTT.addLesson(lessonsData[j]);
+                    j++;
+                    break;
                 case 2:
-                    if (lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) <= 10 && lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) < 15) {
-                        inputTT.addLesson(lessonsData[j]);
-                    } else j++;
+                    if (lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) <= 10 && lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) < 15)inputTT.addLesson(lessonsData[j]);
+                    j++;
+                    break;
                 case 3:
-                    if (lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) <= 15 && lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) < 20) {
-                        inputTT.addLesson(lessonsData[j]);
-                    } else j++;
+                    if (lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) <= 15 && lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) < 20)inputTT.addLesson(lessonsData[j]);
+                    j++;
+                    break;
                 case 4:
-                    if (lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) <= 20 && lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) < 25) {
-                        inputTT.addLesson(lessonsData[j]);
-                    } else j++;
+                    if (lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) <= 20 && lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) < 25)inputTT.addLesson(lessonsData[j]);
+                    j++;
+                    break;
                 default:
                     System.out.println("Wrong index");
                     break;
