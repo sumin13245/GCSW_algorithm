@@ -16,7 +16,7 @@ public class mainClass {
         timeTable cdInputTimeTable = new timeTable();
         timeTable doInputTimeTable = new timeTable();
 
-        lesson[] lessonData = new lesson[200]; // 데이터 배열로 담았어요 (매번 io 하긴 느릴 것 같아서)
+        lesson[] lessonData = new lesson[200]; //Array to hold data from input.txt
         int i = 0;
 
         while ((data = fileReader.readLine()) != null) {
@@ -37,10 +37,10 @@ public class mainClass {
             if(key!= -1)
                 if(cdInputTimeTable.addLesson(lessonData[key]) && doInputTimeTable.addLesson(lessonData[key]))
                     j++;
-                    //여기에 그 파일에서 학수번호로 lesson 찾아서 inputTimes 나오니까 true 나올 때까지 받게 하면 중복피할 수 있음(완료)
+
         }
         int reqCredit = 0;
-        while (reqCredit<12||reqCredit>21) { // 최대, 최소학점 (없으면 이상하게 input 했을 때 무한루프)
+        while (reqCredit<12||reqCredit>21) { //Maximum and Minimum Credits
             System.out.println("원하는 학점을 입력하세요");
             reqCredit = input.nextInt();
         }
@@ -55,11 +55,10 @@ public class mainClass {
 
         input.close();
 
-    } // main 함수의 끝 부분 괄호
+    }
 
-    private static timeTable closeDistance(timeTable inputTT,int max,lesson[] lessonsData,int reqCredit){ // 여기서 max 값은 lessonsData 값입니다
-                // 그냥 바로 다음 수업만 추가하겠습니다
-        distance Distance = new distance();// 검색을 위한 context,queryMinDistance 에서 만들면 낭비일거같아 여기서 만듭니다
+    private static timeTable closeDistance(timeTable inputTT,int max,lesson[] lessonsData,int reqCredit){ //  max value is lessonsData value
+        distance Distance = new distance();// context for search
         lesson[] tableData = inputTT.getTable();
         calculateCD(inputTT, lessonsData, tableData, Distance, max,reqCredit);
 
@@ -89,9 +88,9 @@ public class mainClass {
         char[] date;
         int index;
         for(int chack = 0; chack<5; chack++) {
-            for (int i = 0; i < 25; i++) {  // 안에 들어있는 데이터를 검사
-                if (inputTT.getTotalCredit() < reqCredit) {// 요구 학점이상이라면
-                    if (tableData[i] != null) {//찾으면
+            for (int i = 0; i < 25; i++) {  // check the data inside Table
+                if (inputTT.getTotalCredit() < reqCredit) {//If more than the required grades
+                    if (tableData[i] != null) {
                         char[] reqDate = new char[2];
                         date = tableData[i].getDate().toCharArray();
                         for (int cp = 0; cp < date.length; cp += 2) {
@@ -99,13 +98,13 @@ public class mainClass {
                             reqDate[0] = date[0];
                             index = tableData[i].dateToIndex(date);
                             switch (index % 5) {
-                                case 0: // 다음 수업 하나를 찿고 그중에서 min 값을 찾으면 데이터를 삽입한다.
-                                    putMdLesson(distance, inputTT, tableData, lessonsData, date, index, i, reqDate,reqCredit, max, 1);
+                                case 0: // putMdLesson: Find the closest class and add it to the table
+                                    putMdLesson(distance, inputTT, tableData, lessonsData, date, index, i, reqDate,reqCredit, max, 1);//If it is a lesson in the first lesson, only the time after that is considered
                                     break;
-                                case 4://앞으로만 이어붙이기
-                                    putMdLesson(distance, inputTT, tableData, lessonsData, date, index, i, reqDate,reqCredit, max, -1);
+                                case 4:
+                                    putMdLesson(distance, inputTT, tableData, lessonsData, date, index, i, reqDate,reqCredit, max, -1);//In the case of lesson 5 in lesson 5, only the previous time is considered.
                                     break;
-                                default:// 앞 뒤로 이어붙이기 for 1 2 3
+                                default:// Consider both before and after times for 2 3 4
                                     putMdLesson(distance, inputTT, tableData, lessonsData, date, index, i, reqDate,reqCredit, max, -1);
                                     putMdLesson(distance, inputTT, tableData, lessonsData, date, index, i, reqDate,reqCredit, max, 1);
                                     break;
@@ -119,10 +118,10 @@ public class mainClass {
 
     private static void putMdLesson(distance distance,timeTable inputTT, lesson[] tableData, lesson[] lessonsData,char[] date, int index, int i, char[] reqDate,int reqCredit, int max,int mode) {
         int tableIndex;
-        if(tableData[index+mode]==null) {
-            reqDate[1] = (char) ((int) date[1] +mode);
-            tableIndex = queryMinDistance(distance, inputTT, tableData[i], lessonsData, reqDate,reqCredit, max);
-            if (tableIndex != -1) inputTT.addLesson(lessonsData[tableIndex]);
+        if(tableData[index+mode]==null) { // If there is a place to put a lesson at any time you want
+            reqDate[1] = (char) ((int) date[1] +mode);//Calculate reqDate[1]
+            tableIndex = queryMinDistance(distance, inputTT, tableData[i], lessonsData, reqDate,reqCredit, max); //find the nearest
+            if (tableIndex != -1) inputTT.addLesson(lessonsData[tableIndex]);//Add if valid
         }
     }
 
@@ -161,9 +160,9 @@ public class mainClass {
         String sReqDate = new String(reqDate);
 
         for(int k = 0;k<dataSize;k++) {
-            if (lessonData[k].getDate().contains(sReqDate)&&inputTT.getTotalCredit()+lessonData[k].getCredit()<=reqCredit) {
-                disInfo = Distance.getDistance(userLs.getBuilding(), lessonData[k].getBuilding(), userLs.getBuilding_num(), lessonData[k].getBuilding_num());
-                    if (minDis > disInfo && inputTT.isCanPutIn(lessonData[k])) {
+            if (lessonData[k].getDate().contains(sReqDate)&&inputTT.getTotalCredit()+lessonData[k].getCredit()<=reqCredit) { //If the class is held during reqDate, Also, if adding this lesson does not exceed reqCredit
+                disInfo = Distance.getDistance(userLs.getBuilding(), lessonData[k].getBuilding(), userLs.getBuilding_num(), lessonData[k].getBuilding_num());//check the distance
+                    if (minDis > disInfo && inputTT.isCanPutIn(lessonData[k])) {//If the distance is less compared to the minimum distance, change the minimum distance.
                         minIndex = k;
                         minDis = disInfo;
                     }
@@ -175,7 +174,7 @@ public class mainClass {
         return  minIndex;
     }
 
-    private static int queryAsNum(int userWant,lesson[] lessonData,int dataSize){
+    private static int queryAsNum(int userWant,lesson[] lessonData,int dataSize){ //Find lesson index by class number
         for(int k = 0;k<dataSize;k++) {
             if (lessonData[k].getLesson_num() == userWant)
                 return k;
