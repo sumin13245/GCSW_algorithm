@@ -43,6 +43,7 @@ public class mainClass {
             System.out.println("원하는 학점을 입력하세요");
             reqCredit = input.nextInt();
         }
+
         System.out.println("closeDistance 시간표\n");
         timeTable cdOffTimeTable = closeDistance(inputTimeTable,i,lessonData,reqCredit);
         cdOffTimeTable.print();
@@ -50,6 +51,7 @@ public class mainClass {
         System.out.println("daysOff 시간표\n");
         timeTable doTimeTable = daysOff(inputTimeTable,lessonData,reqCredit);
         doTimeTable.print();
+
         input.close();
 
     } // main 함수의 끝 부분 괄호
@@ -144,6 +146,7 @@ public class mainClass {
 
     private static void addLessonSameDay(int day, int reqCredit, timeTable inputTT, lesson[] lessonsData) {
         int j = 0;
+
         while (j < 157 && inputTT.getTotalCredit() < reqCredit) {
             if(lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) <= (day*5) && lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) < (day+1)*5)inputTT.addLesson(lessonsData[j]);
             j++;
