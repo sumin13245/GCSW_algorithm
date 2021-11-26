@@ -6,10 +6,10 @@ public class distance {
 
     public double getDistance(String src, String des,double srcFloor, double desFloor){
         double distance;
-        double floorPoint = srcFloor/1000+desFloor/1000; // 다른 건물일 때 층 point
-        double sbFloorPoint = abs(srcFloor - desFloor) / 1000;// 같은 건물일 때 층 point
+        double floorPoint = srcFloor/1000+desFloor/1000; // The number of floors in a different building
+        double sbFloorPoint = abs(srcFloor - desFloor) / 1000;// Number of floors in the same building
         switch (src){
-            case "비전타워": // 출발지
+            case "비전타워": // Starting point
                 if(des.equals("IT대학"))
                     distance = 1.0;
                 else if(des.equals("가천관"))

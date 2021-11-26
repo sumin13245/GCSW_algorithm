@@ -19,8 +19,8 @@ public class timeTable {
 			int length = date.length;
 
 			for(int i =0; i<length; i+=2) {
-				if(i == 0) TotalCredit += lesson.getCredit();
-				date[0]= date[i];// 이후 수업 고려를 위해
+				if(i == 0) TotalCredit += lesson.getCredit(); //Avoid duplicating ADD for two-day classes
+				date[0]= date[i];// for a two-day class
 				int lessonIndex = lesson.dateToIndex(date);
 				table[lessonIndex]=lesson;
 				index[lessonIndex]=lesson.getLesson_num();
@@ -49,7 +49,7 @@ public class timeTable {
 		char date[] = lesson.getDate().toCharArray();
 		int length = date.length;
 		for(int i =0; i<length; i+=2) {
-			date[0]= date[i];// 두개인 수업일 때 이후 수업 고려를 위해
+			date[0]= date[i];//for a two-day class
 			int lessonIndex = lesson.dateToIndex(date);
 			if(table[lessonIndex]!=null)return false;
 		}
