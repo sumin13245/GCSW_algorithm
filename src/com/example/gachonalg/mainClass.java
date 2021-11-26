@@ -44,7 +44,7 @@ public class mainClass {
             reqCredit = input.nextInt();
         }
         inputTimeTable = closeDistance(inputTimeTable,i,lessonData,reqCredit);
-        inputTimeTable = daysOff(inputTimeTable,i,lessonData);
+        //inputTimeTable = daysOff(inputTimeTable,i,lessonData);
         inputTimeTable.print();
         input.close();
 
@@ -140,7 +140,7 @@ public class mainClass {
 
     private static void addLessonSameDay(int day, int max, timeTable inputTT, lesson[] lessonsData) {
         int j = 0;
-        while (j <= 157 && inputTT.getNumOfLesson() < max - 1) {
+        while (j < 157 && inputTT.getNumOfLesson() < max - 1) {
             if(lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) <= (day*5) && lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) < (day+1)*5)inputTT.addLesson(lessonsData[j]);
             j++;
         }
