@@ -43,9 +43,13 @@ public class mainClass {
             System.out.println("원하는 학점을 입력하세요");
             reqCredit = input.nextInt();
         }
-        inputTimeTable = closeDistance(inputTimeTable,i,lessonData,reqCredit);
-        inputTimeTable = daysOff(inputTimeTable,i,lessonData);
-        inputTimeTable.print();
+        System.out.println("closeDistance 시간표\n");
+        timeTable cdOffTimeTable = closeDistance(inputTimeTable,i,lessonData,reqCredit);
+        cdOffTimeTable.print();
+
+        System.out.println("daysOff 시간표\n");
+        timeTable doTimeTable = daysOff(inputTimeTable,lessonData,reqCredit);
+        doTimeTable.print();
         input.close();
 
     } // main 함수의 끝 부분 괄호
@@ -120,27 +124,27 @@ public class mainClass {
     }
 
     //method daysOff with input timetable and max number of lessons and lessonData array
-    private static timeTable daysOff(timeTable inputTT, int max, lesson[] lessonsData) {
+    private static timeTable daysOff(timeTable inputTT, lesson[] lessonsData, int reqCredit) {
         // add maximum lesson when same days.
         for (int i = 0; i < 5; i++) {
             if (inputTT.getDays()[i]) {
-                addLessonSameDay(i, max, inputTT, lessonsData);
+                addLessonSameDay(i, reqCredit, inputTT, lessonsData);
             }
         }
         // if not enough num of lesson, add lessons when another days.
-        if ( inputTT.getNumOfLesson() != max) {
+        if ( inputTT.getTotalCredit() < reqCredit) {
             for (int i = 0; i < 5; i++) {
                 if (!inputTT.getDays()[i]) {
-                    addLessonSameDay(i, max, inputTT, lessonsData);
+                    addLessonSameDay(i, reqCredit, inputTT, lessonsData);
                 }
             }
         }
         return inputTT; //return result table
     }
 
-    private static void addLessonSameDay(int day, int max, timeTable inputTT, lesson[] lessonsData) {
+    private static void addLessonSameDay(int day, int reqCredit, timeTable inputTT, lesson[] lessonsData) {
         int j = 0;
-        while (j <= 157 && inputTT.getNumOfLesson() < max - 1) {
+        while (j < 157 && inputTT.getTotalCredit() < reqCredit) {
             if(lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) <= (day*5) && lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) < (day+1)*5)inputTT.addLesson(lessonsData[j]);
             j++;
         }
