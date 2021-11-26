@@ -4,11 +4,13 @@ public class timeTable {
 	private lesson[] table;//monday 0-4,tuesday 5-9, ... friday 20-24
 	private boolean[] days = {false,false,false,false,false};
 	private int numOfLessons = 0;
+	private int TotalCredit;
 
 	private int[] index = new int[25];//monday 0-4,tuesday 5-9, ... friday 20-24 has lesson_num is no lesson, has 0
 	
 	timeTable(){
 		table = new lesson[25];
+		TotalCredit = 0;
 	}
 	
 	public boolean addLesson(lesson lesson) {//If can put the lesson in the timetable, put it in the table and index.
@@ -17,6 +19,7 @@ public class timeTable {
 			int length = date.length;
 
 			for(int i =0; i<length; i+=2) {
+				if(i == 0) TotalCredit += lesson.getCredit();
 				date[0]= date[i];// 이후 수업 고려를 위해
 				int lessonIndex = lesson.dateToIndex(date);
 				table[lessonIndex]=lesson;
@@ -95,6 +98,9 @@ public class timeTable {
 	public lesson[] getTable(){return table;}
 	public int getNumOfLesson() {
 		return numOfLessons;
+	}
+	public int getTotalCredit() {
+		return TotalCredit;
 	}
 	public boolean[] getDays() {
 		return days;

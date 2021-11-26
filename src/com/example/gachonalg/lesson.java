@@ -7,15 +7,17 @@ class lesson {
     private String building;
     private int building_num;
     private int lesson_num;
+    private int credit;
     
     
-    lesson(String lessonName, String professorName, String date, String building, int building_num, int lesson_num) {
+    lesson(String lessonName, String professorName, String date, String building, int building_num, int lesson_num,int credit) {
         this.lessonName = lessonName;
         this.professorName = professorName;
         this.date = date;
         this.building = building;
         this.building_num = building_num;
         this.lesson_num = lesson_num;
+        this.credit = credit;
     }
 
     public int dateToIndex(char[] temp) {//receive the value like 월1,화2... ,return the correct index
@@ -48,7 +50,10 @@ class lesson {
     public int getLesson_num() {
         return lesson_num;
     }
+    public int getCredit(){
+        return  credit;
+    }
     public String toString() {
-    	return  lessonName+" "+professorName+" "+date+" "+building+" "+building_num+" "+lesson_num;
+    	return  lessonName+" "+professorName+" "+date+" "+building+" "+building_num+" "+lesson_num+" "+credit+"학점";
     }
 }
