@@ -13,7 +13,8 @@ public class mainClass {
 
         String data;//lessonName, professorName, date, building,building_num, lesson_num;
         int userWant;
-        timeTable inputTimeTable = new timeTable();
+        timeTable cdInputTimeTable = new timeTable();
+        timeTable doInputTimeTable = new timeTable();
 
         lesson[] lessonData = new lesson[200]; // 데이터 배열로 담았어요 (매번 io 하긴 느릴 것 같아서)
         int i = 0;
@@ -34,7 +35,7 @@ public class mainClass {
             userWant = input.nextInt();
             key = queryAsNum(userWant,lessonData,i);
             if(key!= -1)
-                if(inputTimeTable.addLesson(lessonData[key]))
+                if(cdInputTimeTable.addLesson(lessonData[key]) && doInputTimeTable.addLesson(lessonData[key]))
                     j++;
                     //여기에 그 파일에서 학수번호로 lesson 찾아서 inputTimes 나오니까 true 나올 때까지 받게 하면 중복피할 수 있음(완료)
         }
@@ -45,11 +46,11 @@ public class mainClass {
         }
 
         System.out.println("closeDistance 시간표\n");
-        timeTable cdOffTimeTable = closeDistance(inputTimeTable,i,lessonData,reqCredit);
+        timeTable cdOffTimeTable = closeDistance(cdInputTimeTable,i,lessonData,reqCredit);
         cdOffTimeTable.print();
 
         System.out.println("daysOff 시간표\n");
-        timeTable doTimeTable = daysOff(inputTimeTable,lessonData,reqCredit);
+        timeTable doTimeTable = daysOff(doInputTimeTable,lessonData,reqCredit);
         doTimeTable.print();
 
         input.close();
