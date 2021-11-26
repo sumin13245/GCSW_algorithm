@@ -67,6 +67,7 @@ public class timeTable {
 			System.out.printf("%-15s|  %s\n","15:00 ~ 17:00",(table[i+3]!=null)?(table[i+3].toString()):"");
 			System.out.printf("%-15s|  %s\n\n","17:30 ~ 19:30",(table[i+4]!=null)?(table[i+4].toString()):"");
 		}
+		System.out.println("\n 총 학점 : "+TotalCredit);
 	}
 
 	//method countVars for counting num of lessons and Check the days of the week.
