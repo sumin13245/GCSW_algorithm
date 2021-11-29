@@ -1,4 +1,4 @@
-package Algorithm;
+package com.example.gachonalg;
 
 import java.io.*;
 import java.util.Scanner;
