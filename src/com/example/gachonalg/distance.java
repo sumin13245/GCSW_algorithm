@@ -6,7 +6,7 @@ public class distance {
 
     public double getDistance(String src, String des,double srcFloor, double desFloor){
         double distance;
-        double floorPoint = srcFloor/1000+desFloor/1000; // The number of floors in a different building
+        double floorPoint =  abs(srcFloor)/1000+ abs(desFloor)/1000; // The number of floors in a different building
         double sbFloorPoint = abs(srcFloor - desFloor) / 1000;// Number of floors in the same building
         switch (src){
             case "비전타워": // Starting point
