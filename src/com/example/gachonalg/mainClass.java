@@ -1,61 +1,188 @@
 package com.example.gachonalg;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class mainClass {
 
-    public static void main(String[] args) throws IOException {
-
-        InputStreamReader file_input = new InputStreamReader(new FileInputStream("input.txt"), "UTF-8");
-        BufferedReader fileReader = new BufferedReader(file_input);
-
-        String data;//lessonName, professorName, date, building,building_num, lesson_num;
+    public static void main(String[] args){
+		boolean userWantFirstLesson;
+		boolean userWantLunchTime;
+		boolean userWantLastLesson;
+        lesson[] lessonData = new lesson[200]; //Array to hold data from input.txt
         int userWant;
         timeTable cdInputTimeTable = new timeTable();
         timeTable doInputTimeTable = new timeTable();
+        timeTable myTimeTable = new timeTable();
+        
+        int numOfLesson = readLessonDataFromFile("input.txt",lessonData);
+		if (numOfLesson != -1) {
+			Scanner input = new Scanner(System.in);
+			for (int j = 0; j < 3;) {
+				int key;
+				System.out.println("원하는 강의 학수번호를 입력하세요");
+				userWant = input.nextInt();
+				key = queryAsNum(userWant, lessonData, numOfLesson);
+				if (key != -1)
+					if ((cdInputTimeTable.addLesson(lessonData[key]) && doInputTimeTable.addLesson(lessonData[key]))&&myTimeTable.addLesson(lessonData[key]))
+						j++;
 
-        lesson[] lessonData = new lesson[200]; //Array to hold data from input.txt
-        int i = 0;
+			}
+			int reqCredit = 0;
+			while (reqCredit < 12 || reqCredit > 21) { // Maximum and Minimum Credits
+				System.out.println("원하는 학점을 입력하세요");
+				reqCredit = input.nextInt();
+			}
+			System.out.println("1교시 좋으세요");
+			userWantFirstLesson = (input.nextInt()==1)?(true):(false);
+			System.out.println("점심시간을 원하세요");
+			userWantLunchTime = (input.nextInt()==1)?(true):(false);
+			System.out.println("마지막 강의 좋으세요");
+			userWantLastLesson = (input.nextInt()==1)?(true):(false);
 
-        while ((data = fileReader.readLine()) != null) {
-            String[] dataSplit = data.split(" ");
-            dataSplit[0] = dataSplit[0].replace("!", " ");
-            dataSplit[1] = dataSplit[1].replace("!", " ");
-            lessonData[i++] = new lesson(dataSplit[0], dataSplit[1], dataSplit[2], dataSplit[3], Integer.parseInt(dataSplit[4]), Integer.parseInt(dataSplit[5]),Integer.parseInt(dataSplit[6]));
-        }
-        fileReader.close();
+			System.out.println("closeDistance 시간표\n");
+			timeTable cdOffTimeTable = closeDistance(cdInputTimeTable, numOfLesson, lessonData, reqCredit);
+			cdOffTimeTable.print();
 
-        Scanner input = new Scanner(System.in);
+			System.out.println("daysOff 시간표\n");
+			timeTable doTimeTable = daysOff(doInputTimeTable, lessonData, reqCredit);
+			doTimeTable.print();
 
-        int j = 0;
-        while ( j < 3) {
-            int key;
-            userWant = input.nextInt();
-            key = queryAsNum(userWant,lessonData,i);
-            if(key!= -1)
-                if(cdInputTimeTable.addLesson(lessonData[key]) && doInputTimeTable.addLesson(lessonData[key]))
-                    j++;
+			System.out.println("test 시간표\n");
+			makeTimeTable(myTimeTable, lessonData, numOfLesson, userWantFirstLesson, userWantLunchTime,userWantLastLesson,reqCredit);
+			myTimeTable.print();
 
-        }
-        int reqCredit = 0;
-        while (reqCredit<12||reqCredit>21) { //Maximum and Minimum Credits
-            System.out.println("원하는 학점을 입력하세요");
-            reqCredit = input.nextInt();
-        }
-
-        System.out.println("closeDistance 시간표\n");
-        timeTable cdOffTimeTable = closeDistance(cdInputTimeTable,i,lessonData,reqCredit);
-        cdOffTimeTable.print();
-
-        System.out.println("daysOff 시간표\n");
-        timeTable doTimeTable = daysOff(doInputTimeTable,lessonData,reqCredit);
-        doTimeTable.print();
-
-        input.close();
-
+			input.close();
+		}
     }
+    
+    private static int readLessonDataFromFile(String fileName, lesson[] lessonData) {//read all lesson from file, store in lesson data And return num of lesson
+		int numOfLesson = 0;
+		try {
+			InputStreamReader fileInput = new InputStreamReader(new FileInputStream(fileName), "UTF-8");
+			BufferedReader fileReader = new BufferedReader(fileInput);
+			String data;//lessonName, professorName, date, building,building_num, lesson_num;
+			while ((data = fileReader.readLine()) != null) {
+				String[] dataSplit = data.split(" ");
+				dataSplit[0] = dataSplit[0].replace("!", " ");
+				dataSplit[1] = dataSplit[1].replace("!", " ");
+				lessonData[numOfLesson++] = new lesson(dataSplit[0], dataSplit[1], dataSplit[2], dataSplit[3], Integer.parseInt(dataSplit[4]), Integer.parseInt(dataSplit[5]),Integer.parseInt(dataSplit[6]));
+			}
+			fileInput.close();
+			fileReader.close();
+		} catch (IOException e) {
+			System.out.println("Error occurred with file : "+fileName);
+			return -1;
+		}
+		return numOfLesson;
+    }
+    
+    private static void makeTimeTable(timeTable timeTable, lesson[] lessonData, int numOfLesson, boolean userWantFirstLesson, boolean userWantLunchTime, boolean userWantLastLesson, int goalCredit) {
+    	boolean[] dayHasLesson=timeTable.getDays();
+    	for(int i =0; i<5; i++)if(dayHasLesson[i]) makeDailyTimeTable(timeTable, lessonData, numOfLesson, i, userWantFirstLesson, userWantLunchTime, userWantLastLesson, goalCredit);
+    	if(timeTable.getTotalCredit()<=goalCredit-2) {
+    		System.out.println("학점이 부족합니다");
+    	}
+    }
+    
+    private static void makeDailyTimeTable(timeTable timeTable, lesson[] lessonData, int numOfLesson, int dayChose ,boolean userWantFirstLesson, boolean userWantLunchTime, boolean userWantLastLesson, int goalCredit) {
+    	lesson[] table = timeTable.getTable();
+    	int[] timeHaveLesson = {0,0,0,0,0};//0-didn't decided 1-user selected lesson 2 - need input  -1 - don't input
+    	for(int i = dayChose*5;i<(dayChose+1)*5;i++)if(table[i]!=null)timeHaveLesson[i%5]=1;
+    	if (userWantLunchTime) {
+    		switch (timeHaveLesson[1]+timeHaveLesson[2]) {
+    			case 0:
+    				timeHaveLesson[1]=2;
+    				timeHaveLesson[2]=-1;
+    				break;
+    			case 1:
+    				if(timeHaveLesson[1]==0)timeHaveLesson[1]=-1;
+    				else timeHaveLesson[2]=-1;
+    				break;
+    			case 2:
+    				if(timeHaveLesson[3]==0&&timeHaveLesson[4]==0)timeHaveLesson[3]=-1;
+    				if(timeHaveLesson[4]==0)timeHaveLesson[4]=-1;
+    				break;
+    		}if(timeHaveLesson[1]!=-1)timeHaveLesson[0]=2;
+    		else if(userWantFirstLesson)timeHaveLesson[0]=2;
+        	if(timeHaveLesson[3]!=-1&&timeHaveLesson[3]!=1)timeHaveLesson[3]=2;
+        	if(timeHaveLesson[4]!=-1&&timeHaveLesson[4]!=1)timeHaveLesson[4]=2;
+    	}else for(int i=0; i<5;i++)if(timeHaveLesson[i]!=1)timeHaveLesson[i]=2;
+    	if(!userWantFirstLesson)if(timeHaveLesson[0]!=1)timeHaveLesson[0]=-1;
+    	if(!userWantLastLesson)if(timeHaveLesson[4]!=1)timeHaveLesson[4]=-1;
+    	addLessonWithCondition(timeTable,timeHaveLesson,lessonData,numOfLesson,dayChose,userWantLunchTime,goalCredit);
+    }
+    
+	private static void addLessonWithCondition(timeTable timeTable, int[] dailyTable, lesson[] lessonData,int numOfLesson, int dayChose, boolean userWantLunchTime, int goalCredit) {
+		int cursor = 4;
+		while (true) {
+			if (dailyTable[cursor] == 1) {
+				addLessonWithDistance(timeTable, dailyTable, lessonData, numOfLesson, dayChose, cursor, goalCredit, +1);
+				addLessonWithDistance(timeTable, dailyTable, lessonData, numOfLesson, dayChose, cursor, goalCredit, -1);
+			}
+			cursor--;
+			if (cursor < 0)
+				break;
+		}
+	}
+    
+    private static void addLessonWithDistance(timeTable timeTable, int[] dailyTable, lesson[] lessonData, int numOfLesson, int dayChose,int cursor ,int goalCredit, int direction) {
+    	while(true) {
+        	if(cursor+direction<0||cursor+direction>4)break;
+        	lesson[] table = timeTable.getTable();
+        	if(dailyTable[cursor+direction]==2) {
+        		lesson lessonToAdd = findShortestLesson(timeTable,dailyTable,lessonData,numOfLesson,table[(dayChose*5)+(cursor)],dayChose,direction);
+        		if(lessonToAdd==null)break;
+        		if(timeTable.getTotalCredit()+lessonToAdd.getCredit()<=goalCredit) {
+        			timeTable.addLesson(lessonToAdd);
+        			dailyTable[cursor+direction]=1;
+        		}else if(timeTable.getTotalCredit()>=goalCredit-2)break;
+        	}else if(dailyTable[cursor+direction]==1) break;
+        	else if(0<=cursor+(direction*2)&&cursor+(direction*2)<5) {
+        		if(dailyTable[cursor+(direction*2)]==2) {
+            		lesson lessonToAdd = findShortestLesson(timeTable,dailyTable,lessonData,numOfLesson,null,dayChose,direction);
+            		if(lessonToAdd==null)break;
+            		if(timeTable.getTotalCredit()+lessonToAdd.getCredit()<=goalCredit) {
+            			timeTable.addLesson(lessonToAdd);
+            			dailyTable[cursor+(direction*2)]=1;
+            			break;
+            		}
+        		}
+        	}
+        	cursor+=direction;
+    	}
+    }
+    
+	private static lesson findShortestLesson(timeTable timeTable, int[] dailyTable, lesson[] lessonData, int numOfLesson,lesson criterion, int dayChose, int direction) {
+		if (criterion == null) {
+			for (int k = 2; k >= 0 && k < 5; k += direction) {
+				if(dailyTable[k]==2&&dailyTable[k-direction]==-1)
+					for (int i = 0; i < numOfLesson; i++) {
+						int time = (dayChose*5)+k;
+						if (lessonData[i].dateToIndex(lessonData[i].getDate().substring(0, 2).toCharArray()) == time)if(timeTable.isCanPutIn(lessonData[i]))return lessonData[i];
+				}
+			}
+		} else {
+			distance distanceCalculator = new distance();
+			double minDistance = 2;
+			int minIndex = -1;
+			int time = criterion.dateToIndex(criterion.getDate().substring(0, 2).toCharArray());
+			if (dayChose * 5 < time && time <= (dayChose + 1) * 5)time += direction;
+			else time = criterion.dateToIndex(criterion.getDate().substring(2, 4).toCharArray()) + direction;
+			for (int i = 0; i < numOfLesson; i++) {
+				if (lessonData[i].dateToIndex(lessonData[i].getDate().substring(0, 2).toCharArray()) == time) {
+					double temp = distanceCalculator.getDistance(criterion.getBuilding(), lessonData[i].getBuilding(),criterion.getBuildingNum(), lessonData[i].getBuildingNum());
+					if (minDistance > temp && timeTable.isCanPutIn(lessonData[i])) {
+						minIndex = i;
+						minDistance = temp;
+					}
+				}
+			}
+			return (minIndex != -1) ? (lessonData[minIndex]) : (null);
+		}
+		return null;
+	}
+    
 
     private static timeTable closeDistance(timeTable inputTT,int max,lesson[] lessonsData,int reqCredit){ //  max value is lessonsData value
         distance Distance = new distance();// context for search
@@ -79,10 +206,11 @@ public class mainClass {
                 }
             }
             calculateCD(inputTT, lessonsData, tableData, Distance, max,reqCredit);
+            input.close();
         }
-
         return inputTT;
     }
+    
 
     private static void calculateCD(timeTable inputTT, lesson[] lessonsData, lesson[] tableData, distance distance, int max ,int reqCredit) {
         char[] date;
@@ -146,7 +274,6 @@ public class mainClass {
 
     private static void addLessonSameDay(int day, int reqCredit, timeTable inputTT, lesson[] lessonsData) {
         int j = 0;
-
         while (j < 157 && inputTT.getTotalCredit() < reqCredit) {
             if(lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) <= (day*5) && lessonsData[j].dateToIndex(lessonsData[j].getDate().toCharArray()) < (day+1)*5)inputTT.addLesson(lessonsData[j]);
             j++;
@@ -161,25 +288,21 @@ public class mainClass {
 
         for(int k = 0;k<dataSize;k++) {
             if (lessonData[k].getDate().contains(sReqDate)&&inputTT.getTotalCredit()+lessonData[k].getCredit()<=reqCredit) { //If the class is held during reqDate, Also, if adding this lesson does not exceed reqCredit
-                disInfo = Distance.getDistance(userLs.getBuilding(), lessonData[k].getBuilding(), userLs.getBuilding_num(), lessonData[k].getBuilding_num());//check the distance
+                disInfo = Distance.getDistance(userLs.getBuilding(), lessonData[k].getBuilding(), userLs.getBuildingNum(), lessonData[k].getBuildingNum());//check the distance
                     if (minDis > disInfo && inputTT.isCanPutIn(lessonData[k])) {//If the distance is less compared to the minimum distance, change the minimum distance.
                         minIndex = k;
                         minDis = disInfo;
                     }
             }
         }
-        if(minDis == 10000)
-            System.out.println("Cannot find lesson for: "+sReqDate);
-
         return  minIndex;
     }
 
     private static int queryAsNum(int userWant,lesson[] lessonData,int dataSize){ //Find lesson index by class number
         for(int k = 0;k<dataSize;k++) {
-            if (lessonData[k].getLesson_num() == userWant)
+            if (lessonData[k].getLessonNum() == userWant)
                 return k;
         }
-        System.out.println("Cannot find lesson");
         return  -1;
     }
 
