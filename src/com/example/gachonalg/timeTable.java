@@ -17,29 +17,24 @@ public class timeTable {
 		if(isCanPutIn(lesson)) {
 			char date[] = lesson.getDate().toCharArray();
 			int length = date.length;
-
 			for(int i =0; i<length; i+=2) {
 				if(i == 0) TotalCredit += lesson.getCredit(); //Avoid duplicating ADD for two-day classes
 				date[0]= date[i];// for a two-day class
 				int lessonIndex = lesson.dateToIndex(date);
 				table[lessonIndex]=lesson;
-				index[lessonIndex]=lesson.getLesson_num();
-
+				index[lessonIndex]=lesson.getLessonNum();
 				countVars(lessonIndex);
 			}
 			return true;
 		}
-		else {
-			System.out.println("Can't do that");
-			return false;
-		}
+		else return false;
 	}
 
 	public boolean isDuplicate(lesson lesson) {//Check if there's the same lesson
 		for(int i = 0; i<25; i++) {
 			if(index[i]!=0) {
-				if(index[i]==lesson.getLesson_num())return true;
-				else if(table[i].getLessonName().equals(lesson.getLessonName()))return true;
+				if(index[i]==lesson.getLessonNum())return true;
+				else if(table[i].getLessonName().substring(0, 7).equals(lesson.getLessonName().substring(0, 7)))return true;
 			}
 		}
 		return false;
