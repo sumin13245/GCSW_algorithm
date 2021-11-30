@@ -68,8 +68,6 @@ public class mainClass {
 				dataSplit[1] = dataSplit[1].replace("!", " ");
 				lessonData[numOfLesson++] = new lesson(dataSplit[0], dataSplit[1], dataSplit[2], dataSplit[3], Integer.parseInt(dataSplit[4]), Integer.parseInt(dataSplit[5]),Integer.parseInt(dataSplit[6]));
 			}
-			fileInput.close();
-			fileReader.close();
 		} catch (IOException e) {
 			System.out.println("Error occurred with file : "+fileName);
 			return -1;
@@ -80,8 +78,31 @@ public class mainClass {
     private static void makeTimeTable(timeTable timeTable, lesson[] lessonData, int numOfLesson, boolean userWantFirstLesson, boolean userWantLunchTime, boolean userWantLastLesson, int goalCredit) {
     	boolean[] dayHasLesson=timeTable.getDays();
     	for(int i =0; i<5; i++)if(dayHasLesson[i]) makeDailyTimeTable(timeTable, lessonData, numOfLesson, i, userWantFirstLesson, userWantLunchTime, userWantLastLesson, goalCredit);
-    	if(timeTable.getTotalCredit()<=goalCredit-2) {
-    		System.out.println("학점이 부족합니다");
+    	while(timeTable.getTotalCredit()<=goalCredit-2) {
+    		timeTable.print();
+    		System.out.println("학점이 부족합니다. 현재 학점 :"+timeTable.getTotalCredit());
+    		System.out.println("다른 요일에 강의를 더 넣으시겠습니까?");
+    		System.out.println("yes: 1 , no: 0");
+            Scanner userInput = new Scanner(System.in);
+            int choice = userInput.nextInt();
+            if(choice==0)break;
+    		 System.out.println("어느 요일을 추가하시겠습니까? 숫자로 입력해주세요");
+             boolean[] Days = timeTable.getDays();
+             char[] week = new char[]{'월', '화', '수', '목', '금'};
+             for (int i = 0; i < 5; i++) {
+                 if (!Days[i]) System.out.print(i + ":" + week[i] + " ");
+             }
+             int wantDay = userInput.nextInt();
+			 for (int i = 0; i < numOfLesson; i++) {
+				 int time = (wantDay*5)+2;
+					if (lessonData[i].dateToIndex(lessonData[i].getDate().substring(0, 2).toCharArray()) == time)if(timeTable.isCanPutIn(lessonData[i])){
+						if(timeTable.getTotalCredit()+lessonData[i].getCredit()<=goalCredit) {
+							timeTable.addLesson(lessonData[i]);
+							break;
+						}
+					}
+			 }
+             makeDailyTimeTable(timeTable, lessonData, numOfLesson, wantDay, userWantFirstLesson, userWantLunchTime, userWantLastLesson, goalCredit);
     	}
     }
     
@@ -103,8 +124,8 @@ public class mainClass {
     				if(timeHaveLesson[3]==0&&timeHaveLesson[4]==0)timeHaveLesson[3]=-1;
     				if(timeHaveLesson[4]==0)timeHaveLesson[4]=-1;
     				break;
-    		}if(timeHaveLesson[1]!=-1)timeHaveLesson[0]=2;
-    		else if(userWantFirstLesson)timeHaveLesson[0]=2;
+    		}if(timeHaveLesson[1]!=-1&&timeHaveLesson[0]!=1)timeHaveLesson[0]=2;
+    		else if(userWantFirstLesson&&timeHaveLesson[0]!=1)timeHaveLesson[0]=2;
         	if(timeHaveLesson[3]!=-1&&timeHaveLesson[3]!=1)timeHaveLesson[3]=2;
         	if(timeHaveLesson[4]!=-1&&timeHaveLesson[4]!=1)timeHaveLesson[4]=2;
     	}else for(int i=0; i<5;i++)if(timeHaveLesson[i]!=1)timeHaveLesson[i]=2;
@@ -206,7 +227,6 @@ public class mainClass {
                 }
             }
             calculateCD(inputTT, lessonsData, tableData, Distance, max,reqCredit);
-            input.close();
         }
         return inputTT;
     }
