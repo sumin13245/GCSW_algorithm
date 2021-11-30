@@ -210,7 +210,7 @@ public class mainClass {
         lesson[] tableData = inputTT.getTable();
         calculateCD(inputTT, lessonsData, tableData, Distance, max,reqCredit);
 
-        while (inputTT.getTotalCredit()<reqCredit) {
+        while (inputTT.getTotalCredit()+1<reqCredit) {
             System.out.println("학점이 부족합니다 어느 요일을 추가하시겠습니까? 숫자로 입력해주세요");
             boolean[] Days = inputTT.getDays();
             char[] week = new char[]{'월', '화', '수', '목', '금'};
